@@ -1,0 +1,75 @@
+IDENTIFICATION DIVISION.
+PROGRAM-ID. PAYROLL.
+
+ENVIRONMENT DIVISION.
+INPUT-OUTPUT SECTION.
+FILE-CONTROL.
+
+    SELECT EMP-FILE
+    ASSIGN TO "EMPLOYEE.TXT"
+    ORGANIZATION IS LINE SEQUENTIAL
+    FILE STATUS IS WS-STATUS.
+
+DATA DIVISION.
+FILE SECTION.
+
+FD EMP-FILE.
+
+01 EMP-RECORD.
+   05 EMP-ID       PIC 9(5).
+   05 EMP-NAME     PIC X(10).
+   05 EMP-BASIC    PIC 9(6).
+
+WORKING-STORAGE SECTION.
+
+01 WS-STATUS       PIC XX.
+01 WS-EOF          PIC X VALUE "N".
+
+01 WS-HRA          PIC 9(6).
+01 WS-DA           PIC 9(6).
+01 WS-GROSS        PIC 9(7).
+01 WS-TOTAL        PIC 9(9) VALUE 0.
+
+PROCEDURE DIVISION.
+
+    OPEN INPUT EMP-FILE
+
+    IF WS-STATUS NOT = "00"
+        DISPLAY "FILE OPEN ERROR: " WS-STATUS
+        STOP RUN
+    END-IF
+
+    PERFORM UNTIL WS-EOF = "Y"
+
+        READ EMP-FILE
+            AT END
+                MOVE "Y" TO WS-EOF
+            NOT AT END
+
+                COMPUTE WS-HRA = EMP-BASIC * 0.20
+
+                COMPUTE WS-DA = EMP-BASIC * 0.10
+
+                COMPUTE WS-GROSS =
+                    EMP-BASIC + WS-HRA + WS-DA
+
+                ADD WS-GROSS TO WS-TOTAL
+
+                DISPLAY "-------------------------"
+                DISPLAY "EMPLOYEE ID: " EMP-ID
+                DISPLAY "NAME: " EMP-NAME
+                DISPLAY "BASIC: " EMP-BASIC
+                DISPLAY "HRA: " WS-HRA
+                DISPLAY "DA: " WS-DA
+                DISPLAY "GROSS: " WS-GROSS
+
+        END-READ
+
+    END-PERFORM
+
+    DISPLAY "-------------------------"
+    DISPLAY "TOTAL PAYROLL: " WS-TOTAL
+
+    CLOSE EMP-FILE
+
+    STOP RUN.
