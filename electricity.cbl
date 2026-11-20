@@ -1,0 +1,33 @@
+IDENTIFICATION DIVISION.
+PROGRAM-ID. ELECTRICITY.
+
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+
+01 WS-UNITS    PIC 9(4) VALUE 250.
+01 WS-BILL     PIC 9(6) VALUE 0.
+
+PROCEDURE DIVISION.
+
+    EVALUATE TRUE
+
+        WHEN WS-UNITS <= 100
+            COMPUTE WS-BILL = WS-UNITS * 2
+
+        WHEN WS-UNITS <= 200
+            COMPUTE WS-BILL =
+                100 * 2 +
+                (WS-UNITS - 100) * 3
+
+        WHEN OTHER
+            COMPUTE WS-BILL =
+                100 * 2 +
+                100 * 3 +
+                (WS-UNITS - 200) * 5
+
+    END-EVALUATE
+
+    DISPLAY "UNITS CONSUMED: " WS-UNITS
+    DISPLAY "ELECTRICITY BILL: " WS-BILL
+
+    STOP RUN.
